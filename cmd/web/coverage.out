@@ -1,7 +1,7 @@
 mode: set
-webapp/cmd/web/forms.go:10.41,12.26 2 0
-webapp/cmd/web/forms.go:12.26,14.3 1 0
-webapp/cmd/web/forms.go:15.2,15.23 1 0
+webapp/cmd/web/forms.go:10.41,12.26 2 1
+webapp/cmd/web/forms.go:12.26,14.3 1 1
+webapp/cmd/web/forms.go:15.2,15.23 1 1
 webapp/cmd/web/forms.go:18.43,20.2 1 1
 webapp/cmd/web/forms.go:28.37,33.2 1 1
 webapp/cmd/web/forms.go:35.38,37.13 2 1
@@ -10,8 +10,8 @@ webapp/cmd/web/forms.go:40.2,40.13 1 1
 webapp/cmd/web/forms.go:43.43,44.31 1 1
 webapp/cmd/web/forms.go:44.31,46.37 2 1
 webapp/cmd/web/forms.go:46.37,48.4 1 1
-webapp/cmd/web/forms.go:52.51,53.9 1 0
-webapp/cmd/web/forms.go:53.9,55.3 1 0
+webapp/cmd/web/forms.go:52.52,53.9 1 1
+webapp/cmd/web/forms.go:53.9,55.3 1 1
 webapp/cmd/web/forms.go:58.29,60.2 1 1
 webapp/cmd/web/handlers.go:13.70,15.2 1 1
 webapp/cmd/web/handlers.go:22.108,25.16 2 1

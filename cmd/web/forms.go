@@ -49,9 +49,9 @@ func (f *Form) Required(fields ...string) {
 	}
 }
 
-func (f *Form) Check(ok bool, ke, message string) {
+func (f *Form) Check(ok bool, key, message string) {
 	if !ok {
-		f.Errors.Add(ke, message)
+		f.Errors.Add(key, message)
 	}
 }
 
