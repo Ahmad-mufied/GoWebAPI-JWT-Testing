@@ -25,8 +25,6 @@ func Test_application_handlers(t *testing.T) {
 	ts := httptest.NewTLSServer(routes)
 	defer ts.Close()
 
-	
-
 	// range through test data
 	for _, e := range theTests {
 		resp, err := ts.Client().Get(ts.URL + e.url)
@@ -40,7 +38,6 @@ func Test_application_handlers(t *testing.T) {
 		}
 	}
 }
-
 
 func TestAppHomeOld(t *testing.T) {
 	// create a request
@@ -60,14 +57,14 @@ func TestAppHomeOld(t *testing.T) {
 	}
 
 	body, _ := io.ReadAll(rr.Body)
-	if !strings.Contains(string(body), `<small>From Session:`){
+	if !strings.Contains(string(body), `<small>From Session:`) {
 		t.Error("did not find correct text in html")
 	}
 }
 
 func TestAppHome(t *testing.T) {
-	var tests = []struct{
-		name string
+	var tests = []struct {
+		name         string
 		putInSession string
 		expectedHTML string
 	}{
@@ -98,12 +95,11 @@ func TestAppHome(t *testing.T) {
 		}
 
 		body, _ := io.ReadAll(rr.Body)
-		if !strings.Contains(string(body), e.expectedHTML){
+		if !strings.Contains(string(body), e.expectedHTML) {
 			t.Errorf("%s: did not find %s in response body", e.name, e.expectedHTML)
 		}
 	}
 }
-
 
 func TestApp_renderWithBadTemplate(t *testing.T) {
 	// set templates path  to a location with a bad template
@@ -118,6 +114,7 @@ func TestApp_renderWithBadTemplate(t *testing.T) {
 		t.Error("expected error from bad template, but did not get one")
 	}
 
+	pathToTemplates = "./../../templates/"
 
 }
 
