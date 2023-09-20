@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var pathToTemplates = "./templates"
+var pathToTemplates = "./templates/"
 
 func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 	var td = make(map[string]any)
@@ -18,9 +18,9 @@ func (app *application) Home(w http.ResponseWriter, r *http.Request) {
 		msg := app.Session.GetString(r.Context(), "test")
 		td["test"] = msg
 	} else {
-		app.Session.Put(r.Context(), "test", "Hit this page at " + time.Now().UTC().String())
+		app.Session.Put(r.Context(), "test", "Hit this page at "+time.Now().UTC().String())
 	}
-	_ = app.render(w, r, "/home.page.gohtml", &TemplateData{Data: td})
+	_ = app.render(w, r, "home.page.gohtml", &TemplateData{Data: td})
 }
 
 type TemplateData struct {
@@ -29,7 +29,7 @@ type TemplateData struct {
 }
 
 func (app *application) render(w http.ResponseWriter, r *http.Request, t string, data *TemplateData) error {
-	// parse the template from disk
+	// parse the template from disk.
 	parsedTemplate, err := template.ParseFiles(path.Join(pathToTemplates, t), path.Join(pathToTemplates, "base.layout.gohtml"))
 	if err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
@@ -37,13 +37,13 @@ func (app *application) render(w http.ResponseWriter, r *http.Request, t string,
 	}
 
 	data.IP = app.ipFromContext(r.Context())
-	fmt.Println(data.IP)
 
 	// execute the template, passing it data, if any
 	err = parsedTemplate.Execute(w, data)
 	if err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -61,10 +61,18 @@ func (app *application) Login(w http.ResponseWriter, r *http.Request) {
 
 	if !form.Valid() {
 		fmt.Fprint(w, "failed validation")
+		return
 	}
 
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
+
+	user, err := app.DB.GetUserByEmail(email)
+	if err != nil {
+		log.Println(err)
+	}
+
+	log.Println("From database:", user.FirstName)
 
 	log.Println(email, password)
 

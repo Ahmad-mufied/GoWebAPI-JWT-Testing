@@ -1,17 +1,17 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"log"
 	"net/http"
+	"webapp/pkg/db"
 
 	"github.com/alexedwards/scs/v2"
 )
 
 type application struct {
 	DSN     string
-	DB      *sql.DB
+	DB      db.PostgresConn
 	Session *scs.SessionManager
 }
 
@@ -19,7 +19,7 @@ func main() {
 	// set up an app config
 	app := application{}
 
-	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres sslmode=disable timezone=UTC connect_timeout=5", "Postgres connection string")
+	flag.StringVar(&app.DSN, "dsn", "host=localhost port=5432 user=postgres password=postgres sslmode=disable dbname=users timezone=UTC connect_timeout=5", "Postgres connection")
 	flag.Parse()
 
 	// connect to the database
@@ -28,7 +28,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	app.DB = conn
+	app.DB = db.PostgresConn{DB: conn}
 
 	// get a session mamager
 	app.Session = getSession()
