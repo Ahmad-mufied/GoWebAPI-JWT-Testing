@@ -66,7 +66,7 @@ func (m *PostgresDBRepo) GetUser(id int) (*data.User, error) {
 	query := `
 		select 
 			u.id, u.email, u.first_name, u.last_name, u.password, u.is_admin, u.created_at, u.updated_at,
-			coalesce(u.file_name, '')
+			coalesce(ui.file_name, '')
 		from 
 			users u
 		left join user_images ui on (ui.user_id = u.id)
@@ -103,7 +103,7 @@ func (m *PostgresDBRepo) GetUserByEmail(email string) (*data.User, error) {
 	query := `
 		select 
 			u.id, u.email, u.first_name, u.last_name, u.password, u.is_admin, u.created_at, u.updated_at,
-			coalesce(u.file_name, '')
+			coalesce(ui.file_name, '')
 		from 
 			users u
 		left join user_images ui on (ui.user_id = u.id)
