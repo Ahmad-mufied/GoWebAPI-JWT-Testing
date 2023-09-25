@@ -11,6 +11,9 @@ import (
 	"log"
 	"os"
 	"testing"
+	"time"
+	"webapp/pkg/data"
+	"webapp/pkg/repository"
 )
 
 var (
@@ -25,6 +28,7 @@ var (
 var resource *dockertest.Resource
 var pool *dockertest.Pool
 var testDB *sql.DB
+var testRepo repository.DatabaseRepo
 
 func TestMain(m *testing.M) {
 	// connect to docker; fail if docker not running
@@ -79,6 +83,10 @@ func TestMain(m *testing.M) {
 		log.Fatalf("error creating tables: %s", err)
 	}
 
+	testRepo = &PostgresDBRepo{
+		DB: testDB,
+	}
+
 	// run tests
 	code := m.Run()
 
@@ -110,5 +118,26 @@ func Test_pingDB(t *testing.T) {
 	err := testDB.Ping()
 	if err != nil {
 		t.Error("can't ping database")
+	}
+}
+
+func TestPostgresDBRepo_InsertUser(t *testing.T) {
+	testUser := data.User{
+		FirstName: "Admin",
+		LastName:  "User",
+		Email:     "admin@example.com",
+		Password:  "secret",
+		IsAdmin:   1,
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+	}
+
+	id, err := testRepo.InsertUser(testUser)
+	if err != nil {
+		t.Errorf("insert user returned an error: %s", err)
+	}
+
+	if id != 1 {
+		t.Errorf("inser user returned wrong id; but got %d", id)
 	}
 }
