@@ -3,11 +3,18 @@ package main
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
+	"image"
+	"image/png"
 	"io"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
+	"path"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -236,5 +243,68 @@ func Test_app_Login(t *testing.T) {
 		} else {
 			t.Errorf("%s: no location header set", e.name)
 		}
+	}
+}
+
+func TestApplication_UploadFiles(t *testing.T) {
+	// set up pipes
+	pr, pw := io.Pipe()
+
+	// create a new writer, of type *io.Writer
+	writer := multipart.NewWriter(pw)
+
+	// create a waitgroup, and add 1 to it
+	wg := &sync.WaitGroup{}
+	wg.Add(1)
+
+	// simulate uploading a file using a goroutine and our writer
+	go simulatePNGUpload("./testdata/img.png", writer, t, wg)
+
+	// read from the pipe which receives data
+	request := httptest.NewRequest("POST", "/", pr)
+	request.Header.Add("Content-Type", writer.FormDataContentType())
+
+	// call app.UploadFiles
+	uploadedFiles, err := app.UploadFiles(request, "./testdata/uploads/")
+	if err != nil {
+		t.Error(err)
+	}
+
+	// perform our tests
+	if _, err := os.Stat(fmt.Sprintf("./testdata/uploads/%s", uploadedFiles[0].OriginalFileName)); os.IsNotExist(err) {
+		t.Errorf("expected file to exist: %s", err.Error())
+	}
+
+	// clean up
+	_ = os.Remove(fmt.Sprintf("./testdata/uploads/%s", uploadedFiles[0].OriginalFileName))
+}
+
+func simulatePNGUpload(fileToUpload string, writer *multipart.Writer, t *testing.T, wg *sync.WaitGroup) {
+	defer writer.Close()
+	defer wg.Done()
+
+	// create the form data filed 'file' with value being filename
+	part, err := writer.CreateFormFile("file", path.Base(fileToUpload))
+	if err != nil {
+		t.Error(err)
+	}
+
+	// open the actual file
+	f, err := os.Open(fileToUpload)
+	if err != nil {
+		t.Error(err)
+	}
+	defer f.Close()
+
+	// decode the image
+	img, _, err := image.Decode(f)
+	if err != nil {
+		t.Error("error decoding image:", err)
+	}
+
+	// write the png to our io.Writer
+	err = png.Encode(part, img)
+	if err != nil {
+		t.Error(err)
 	}
 }
