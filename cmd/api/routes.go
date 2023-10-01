@@ -16,6 +16,7 @@ func (app *application) routes() http.Handler {
 
 	// authentication routes - auth handler, refresh
 	mux.Post("/auth", app.authenticate)
+	// curl http://localhost:8090/auth -X POST -H "Content-Type: application/json" -d '{"email":"admin@example.com","password":"secret"}'
 	mux.Post("/refresh-token", app.refresh)
 
 	// test handler
