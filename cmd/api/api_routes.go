@@ -13,6 +13,8 @@ func (app *application) routes() http.Handler {
 	mux.Use(middleware.Recoverer)
 	mux.Use(app.enableCORS)
 
+	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./html/"))))
+
 	// authentication routes - auth handler, refresh
 	mux.Post("/auth", app.authenticate)
 	// curl http://localhost:8090/auth -X POST -H "Content-Type: application/json" -d '{"email":"admin@example.com","password":"secret"}'
