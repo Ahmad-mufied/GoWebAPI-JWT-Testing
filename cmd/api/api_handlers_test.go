@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"github.com/go-chi/chi/v5"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -90,5 +92,43 @@ func Test_app_refresh(t *testing.T) {
 
 		refreshTokenExpiry = oldRefreshTime
 	}
+}
 
+func Test_app_userHandlers(t *testing.T) {
+	var tests = []struct {
+		name           string
+		method         string
+		json           string
+		paramID        string
+		handler        http.HandlerFunc
+		expectedStatus int
+	}{
+		{"alluser", "GET", "", "", app.allUsers, http.StatusOK},
+		{"deleteUser", "DELETE", "", "1", app.deleteUser, http.StatusNoContent},
+		{"getUser valid", "GET", "", "1", app.getUser, http.StatusOK},
+		{"getUser invalid", "GET", "", "100", app.getUser, http.StatusBadRequest},
+	}
+
+	for _, e := range tests {
+		var req *http.Request
+		if e.json == "" {
+			req, _ = http.NewRequest(e.method, "/", nil)
+		} else {
+			req, _ = http.NewRequest(e.method, "/", strings.NewReader(e.json))
+		}
+
+		if e.paramID != "" {
+			chiCtx := chi.NewRouteContext()
+			chiCtx.URLParams.Add("userID", e.paramID)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, chiCtx))
+		}
+
+		rr := httptest.NewRecorder()
+		handler := http.HandlerFunc(e.handler)
+		handler.ServeHTTP(rr, req)
+
+		if rr.Code != e.expectedStatus {
+			t.Errorf("%s: wrong status returned; expected %d but got %d", e.name, e.expectedStatus, rr.Code)
+		}
+	}
 }

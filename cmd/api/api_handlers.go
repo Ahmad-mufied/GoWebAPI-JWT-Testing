@@ -128,6 +128,10 @@ func (app *application) getUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user, err := app.DB.GetUser(userID)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
 
 	_ = app.writeJSON(w, http.StatusOK, user)
 
