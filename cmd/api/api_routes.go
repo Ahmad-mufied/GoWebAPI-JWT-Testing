@@ -15,6 +15,12 @@ func (app *application) routes() http.Handler {
 
 	mux.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir("./html/"))))
 
+	mux.Route("/web", func(mux chi.Router) {
+		mux.Post("/auth", app.authenticate)
+		// refresh-token
+		// logout
+	})
+
 	// authentication routes - auth handler, refresh
 	mux.Post("/auth", app.authenticate)
 	// curl http://localhost:8090/auth -X POST -H "Content-Type: application/json" -d '{"email":"admin@example.com","password":"secret"}'
