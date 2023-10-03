@@ -47,6 +47,18 @@ func (app *application) authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	http.SetCookie(w, &http.Cookie{
+		Name:     "__Host-refresh_token",
+		Path:     "/",
+		Value:    tokenPairs.RefreshToken,
+		Expires:  time.Now().Add(refreshTokenExpiry),
+		MaxAge:   int(refreshTokenExpiry.Seconds()),
+		SameSite: http.SameSiteStrictMode,
+		Domain:   "localhost",
+		HttpOnly: true,
+		Secure:   true,
+	})
+
 	// send token to user
 	_ = app.writeJSON(w, http.StatusOK, tokenPairs)
 }
