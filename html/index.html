@@ -81,7 +81,7 @@
         refreshTokens();
     });
 
-    logoutBtn.addEventListener("click", function () {
+    loginBtn.addEventListener("click", function () {
         const payload = {
             email: document.getElementById("email").value,
             password: document.getElementById("password").value
@@ -113,12 +113,11 @@
         const requestOptions = {
             method: 'GET',
             credentials: 'include',
-            headers: {'Content-Type': 'application/json'}
         };
 
         fetch('/web/refresh-token', requestOptions)
             .then(response => response.json())
-                .then((data) => {
+            .then((data) => {
                     if (data.access_token) {
                         access_token = data.access_token;
                         refresh_token = data.refresh_token;
